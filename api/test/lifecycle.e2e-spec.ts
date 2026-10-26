@@ -15,6 +15,7 @@ import { ValkeyService } from '../src/valkey/services';
 describe('Lifecycle (e2e)', () => {
   const FIRST_JTI = 'f400b026-cb4e-4c54-8afd-023805d6f5a4';
   const LATEST_JTI = 'be78e677-98f9-46cd-bd7f-01d24159bfb2';
+  const USER_ID_CODE = 'test-user-id-code';
   const PRIVATE_ROUTER_URL = 'https://private-router.example.test';
 
   let moduleFixture: TestingModule;
@@ -22,10 +23,10 @@ describe('Lifecycle (e2e)', () => {
   let lifecycleWorker: LifecycleWorkerService;
   let valkeyService: ValkeyService;
   let lifecycleCallbackMock: ReturnType<typeof vi.fn>;
-  let chatUuid: string;
+  let userUuid: string;
 
   const cleanUpLifecycleTestState = async (): Promise<void> => {
-    const scope = { uuid: chatUuid, type: LIFECYCLE_SCOPE_TYPE.ChatEndUser };
+    const scope = { uuid: userUuid, type: LIFECYCLE_SCOPE_TYPE.Backoffice };
 
     await Promise.all([
       valkeyService.removeSortedSetMembers(LIFECYCLE_SCHEDULE_KEY, [buildLifecycleScheduleMember(scope)]),
@@ -37,7 +38,7 @@ describe('Lifecycle (e2e)', () => {
   };
 
   beforeEach(async () => {
-    chatUuid = randomUUID();
+    userUuid = randomUUID();
     lifecycleCallbackMock = vi.fn().mockResolvedValue({ status: 200 });
 
     moduleFixture = await Test.createTestingModule({
@@ -77,13 +78,13 @@ describe('Lifecycle (e2e)', () => {
     await moduleFixture.close();
   });
 
-  it('should send the latest token JTI after a chat reconnect', async () => {
-    const connectionScope = { uuid: chatUuid, type: 'chat' as const };
+  it('should send the latest token JTI after a user reconnect', async () => {
+    const connectionScope = { uuid: userUuid, type: 'user' as const };
     const firstConnectionId = randomUUID();
     const reconnectedConnectionId = randomUUID();
 
-    await lifecycleService.registerConnection(connectionScope, firstConnectionId, FIRST_JTI);
-    await lifecycleService.registerConnection(connectionScope, reconnectedConnectionId, LATEST_JTI);
+    await lifecycleService.registerConnection(connectionScope, firstConnectionId, FIRST_JTI, USER_ID_CODE);
+    await lifecycleService.registerConnection(connectionScope, reconnectedConnectionId, LATEST_JTI, USER_ID_CODE);
     await lifecycleService.removeConnection(connectionScope, firstConnectionId);
 
     await new Promise((resolve) => setTimeout(resolve, 650));
@@ -97,9 +98,9 @@ describe('Lifecycle (e2e)', () => {
     });
 
     expect(lifecycleCallbackMock).toHaveBeenCalledWith(
-      `${PRIVATE_ROUTER_URL}/notifications-node/chat/client-left`,
+      `${PRIVATE_ROUTER_URL}/notifications-node/accounts/logout`,
       expect.objectContaining({
-        chatId: chatUuid,
+        userIdCode: USER_ID_CODE,
         jwtId: LATEST_JTI,
       }),
       expect.objectContaining({ timeout: expect.any(Number) }),

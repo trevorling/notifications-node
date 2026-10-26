@@ -558,6 +558,7 @@ describe('PublicNotificationsController (e2e)', () => {
               notification: {
                 title: 'User notification',
                 body: 'Only the matching user should receive this.',
+                event: { type: EVENT_TYPE, uuid: EVENT_UUID },
               },
             }),
             expect.objectContaining({ TTL: 300 }),
