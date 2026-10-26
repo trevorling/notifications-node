@@ -462,8 +462,8 @@ values. `NODE_ENV` defaults to `development` when it is not set.
 | `API_PORT_PUBLIC` | Optional | `3000` | Public API and SSE port; defaults to `3000`. |
 | `API_PORT_PRIVATE` | Optional | `3001` | Private API port; defaults to `3001`. |
 | `TIM_URL` | Required | `http://tim:8085` | Base URL of the TIM service, resolvable and reachable from the API container; must use `http` or `https`. |
-| `PRIVATE_RUUTER_URL` | Required for lifecycle callbacks | `http://ruuter-private:8088` | Base URL of the private Ruuter API, used for chat termination and account logout callbacks; must use `http` or `https`. |
-| `TIM_JWT_COOKIE_NAMES` | Required | `chatJwt,customJwtCookie,customSmaxJwtCookie,userJwt` | Comma-separated JWT cookie names used for TIM authentication; the first name is used in Swagger cookie auth. |
+| `PRIVATE_RUUTER_URL` | Required for lifecycle callbacks | `http://ruuter-private:8088` | Base URL of the private Ruuter API, used for account logout callbacks; must use `http` or `https`. |
+| `TIM_JWT_COOKIE_NAMES` | Required | `chatJwt,customJwtCookie` | Comma-separated JWT cookie names used for TIM authentication; the first name is used in Swagger cookie auth. |
 | `TIM_TOKEN_REVALIDATION_INTERVAL_MS` | Required | `5000` | Interval, in milliseconds, for revalidating TIM tokens. |
 | `PRESENCE_LEASE_SECONDS` | Required | `45` | Server-side end-user SSE presence lease; it must exceed the heartbeat interval. |
 | `TERMINATION_GRACE_SECONDS` | Required | `10` | Time, in seconds, to wait after the last end-user presence lease expires before the final lifecycle presence check. |
